@@ -364,7 +364,7 @@ testing = ["fields", "hunter", "process-tests", "six", "pytest-xdist", "virtuale
 
 [[package]]
 name = "summon-tasks"
-version = "0.1.4"
+version = "0.1.5"
 description = ""
 category = "main"
 optional = true
@@ -458,7 +458,7 @@ core = ["summon-tasks"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "8fc33b98a54c47f66f8950971244b52a9dd5cd906d77391d6019c854e5efa116"
+content-hash = "f2b6d2147e201a491a2c67f44a89ba0de9af7c1f9b239bdf177b2eaa7a30cd6d"
 
 [metadata.files]
 astroid = [
@@ -694,8 +694,8 @@ pytest-cov = [
     {file = "pytest_cov-3.0.0-py3-none-any.whl", hash = "sha256:578d5d15ac4a25e5f961c938b85a05b09fdaae9deef3bb6de9a6e766622ca7a6"},
 ]
 summon-tasks = [
-    {file = "summon-tasks-0.1.4.tar.gz", hash = "sha256:b707b2d4946b665db8972a2509e41fb35ff2498a4b69ddd8443159a6df903d2e"},
-    {file = "summon_tasks-0.1.4-py3-none-any.whl", hash = "sha256:15cbc9d3ae427d2b063831816fef2d8c5064fbf3e4563020c73da09a8cf428d7"},
+    {file = "summon-tasks-0.1.5.tar.gz", hash = "sha256:cbdc87463d22d2f7abde0f3083681d22125a06bd5cdfba3f9e16c82b1532e1e1"},
+    {file = "summon_tasks-0.1.5-py3-none-any.whl", hash = "sha256:e7f04185b63cd1a855ad1468b1c046d9f8c88c668947aaa5f3d608ecdd375364"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
