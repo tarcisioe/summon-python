@@ -458,7 +458,7 @@ core = ["summon-tasks"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "eca90fecde29d0846e4dd2f9655968f026af17f11afa604ebea4b5434c2943e2"
+content-hash = "09b97d59980fef8d288e9ab3371ebbfebe2aa7a2f4dcac2078a4248475ab0c23"
 
 [metadata.files]
 astroid = [
