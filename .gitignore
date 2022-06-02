@@ -10,3 +10,5 @@ __pycache__
 *.sw?
 venv/
 .venv
+
+/.github/workflows/summon.yml
