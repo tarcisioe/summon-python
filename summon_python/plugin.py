@@ -123,6 +123,7 @@ def register_tasks() -> None:
     def setup() -> None:
         """Setup sane defaults for a python project."""
         from .github_actions import setup_github_actions
+        from .pre_commit_hooks import setup_pre_commit_hooks_yml
 
         pyproject_path = reverse_directory_search('pyproject.toml', Path.cwd())
 
@@ -133,3 +134,4 @@ def register_tasks() -> None:
         base_directory = pyproject_path.parent
 
         setup_github_actions(base_directory)
+        setup_pre_commit_hooks_yml(base_directory)
