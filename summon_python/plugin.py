@@ -1,13 +1,13 @@
 """Summon plugin for Python projects."""
 import sys
-from typing import List, Optional
 from pathlib import Path
+from typing import List, Optional
 
 import typer
 from summon.exec import Result, check_commands, execute
 from summon.plugins import hookimpl
-from summon.tasks import task
 from summon.project import reverse_directory_search
+from summon.tasks import task
 
 from .project import args_or_all_modules, get_project_modules, get_test_modules
 

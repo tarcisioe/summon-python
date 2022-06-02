@@ -1,6 +1,6 @@
 """Module to manipulate Github Actions config."""
-from textwrap import dedent
 from pathlib import Path
+from textwrap import dedent
 
 
 def get_github_actions_yml() -> str:
@@ -75,7 +75,8 @@ def get_github_actions_yml() -> str:
               - uses: codecov/codecov-action@v1
                 with:
                   fail_ci_if_error: false  # Setting this to true is a headache.
-    ''')
+    '''
+    )
 
 
 def setup_github_actions(project_base: Path) -> None:
