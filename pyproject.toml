@@ -8,6 +8,7 @@ authors = ["Tarcísio Eduardo Moreira Crocomo <tarcisioe@pm.me>"]
 python = "^3.7"
 toml = "^0.10.2"
 summon-tasks = { version = "^0.1.5", optional = true }
+"ruamel.yaml" = "^0.17.21"
 
 [tool.poetry.dev-dependencies]
 types-toml = "^0.10.7"

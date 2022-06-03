@@ -1,21 +1,20 @@
-# vim: set ft=yaml ts=2 sw=2:
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
+- hooks:
+  - {id: check-yaml}
+  - {id: end-of-file-fixer}
+  - {id: trailing-whitespace}
+  repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v4.2.0
-  hooks:
-  - id: check-yaml
-  - id: end-of-file-fixer
-  - id: trailing-whitespace
-- repo: local
-  hooks:
-  - id: linters
+- hooks:
+  - entry: poetry run summon lint --no-full-report
+    id: linters
+    language: system
     name: Lint
-    entry: poetry run summon lint --no-full-report
-    language: system
-    types: [python]
     require_serial: true
-  - id: formatters
-    name: Format
-    entry: poetry run summon format
-    language: system
     types: [python]
+  - entry: poetry run summon format
+    id: formatters
+    language: system
+    name: Format
+    types: [python]
+  repo: local

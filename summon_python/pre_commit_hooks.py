@@ -1,35 +1,63 @@
 """Module to manipulate Github Actions config."""
 from pathlib import Path
-from textwrap import dedent
+from typing import Any, Dict, List
+
+from ruamel.yaml import safe_dump, safe_load
+
+YamlDict = Dict[str, Any]
+RepoList = List[YamlDict]
 
 
-def get_pre_commit_config_yml() -> str:
+def get_pre_commit_config_yml() -> RepoList:
     """Generate the .pre-commit-config.yml contents."""
-    return dedent(
-        '''\
-        # vim: set ft=yaml ts=2 sw=2:
-        repos:
-        - repo: https://github.com/pre-commit/pre-commit-hooks
-          rev: v4.2.0
-          hooks:
-          - id: check-yaml
-          - id: end-of-file-fixer
-          - id: trailing-whitespace
-        - repo: local
-          hooks:
-          - id: linters
-            name: Lint
-            entry: poetry run summon lint --no-full-report
-            language: system
-            types: [python]
-            require_serial: true
-          - id: formatters
-            name: Format
-            entry: poetry run summon format
-            language: system
-            types: [python]
-        '''
-    )
+
+    return [
+        {
+            'repo': 'https://github.com/pre-commit/pre-commit-hooks',
+            'rev': 'v4.2.0',
+            'hooks': [
+                {'id': 'check-yaml'},
+                {'id': 'end-of-file-fixer'},
+                {'id': 'trailing-whitespace'},
+            ],
+        },
+        {
+            'repo': 'local',
+            'hooks': [
+                {
+                    'id': 'linters',
+                    'name': 'Lint',
+                    'entry': 'poetry run summon lint --no-full-report',
+                    'language': 'system',
+                    'types': ['python'],
+                    'require_serial': True,
+                },
+                {
+                    'id': 'formatters',
+                    'name': 'Format',
+                    'entry': 'poetry run summon format',
+                    'language': 'system',
+                    'types': ['python'],
+                },
+            ],
+        },
+    ]
+
+
+def read_current_pre_commit_hooks(project_base: Path) -> YamlDict:
+    """Read the pre-commit hooks from a given project.
+
+    Args:
+        project_base: The base directory of the project.
+    """
+
+    file_path = project_base / '.pre-commit-config.yaml'
+
+    if not file_path.is_file():
+        return {}
+
+    with file_path.open() as yaml_file:
+        return safe_load(yaml_file)
 
 
 def setup_pre_commit_hooks_yml(project_base: Path) -> None:
@@ -40,4 +68,12 @@ def setup_pre_commit_hooks_yml(project_base: Path) -> None:
                       .pre-commit-config will be located.
     """
 
-    (project_base / '.pre-commit-config.yaml').write_text(get_pre_commit_config_yml())
+    current = read_current_pre_commit_hooks(project_base)
+
+    repos: RepoList = current.get('repos', [])
+    repos_to_add = get_pre_commit_config_yml()
+
+    all_repos = {repo['repo']: repo for repo in (*repos, *repos_to_add)}
+
+    with (project_base / '.pre-commit-config.yaml').open('w') as yaml_file:
+        safe_dump({'repos': list(all_repos.values())}, yaml_file)
