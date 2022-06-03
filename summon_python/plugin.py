@@ -12,7 +12,6 @@ from summon.tasks import task
 from .project import args_or_all_modules, get_project_modules, get_test_modules
 
 
-@hookimpl
 def register_tasks() -> None:
     """Register tasks related to Python projects."""
 
@@ -93,7 +92,7 @@ def register_tasks() -> None:
 
     task(check_commands(format))
 
-    def coverage_html():
+    def coverage_html() -> List[Result]:
         """Generate an html coverage report."""
         return [
             execute('coverage html', raise_error=False),
@@ -123,6 +122,7 @@ def register_tasks() -> None:
     def setup() -> None:
         """Setup sane defaults for a python project."""
         from .github_actions import setup_github_actions
+        from .mypy_config import setup_mypy_config
         from .pre_commit_hooks import setup_pre_commit_hooks_yml
 
         pyproject_path = reverse_directory_search('pyproject.toml', Path.cwd())
@@ -135,3 +135,7 @@ def register_tasks() -> None:
 
         setup_github_actions(base_directory)
         setup_pre_commit_hooks_yml(base_directory)
+        setup_mypy_config(pyproject_path)
+
+
+hookimpl(register_tasks)
