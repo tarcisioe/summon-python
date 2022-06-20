@@ -1,4 +1,5 @@
 """Functions for getting Python-project related information."""
+import os
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, TypeVar, Union, cast
 
@@ -73,18 +74,45 @@ def get_extra_modules_from_toml(toml_dict: TomlDict) -> List[str]:
     return extras
 
 
+def get_packages_glob_pattern_from_package_entry(toml_dict: TomlDict) -> str:
+    """Get the glob pattern from a pyproject.toml Poetry entry in packages`."""
+    if 'from' not in toml_dict:
+        return toml_dict['include']
+
+    return os.sep.join((toml_dict['from'], toml_dict['include']))
+
+
+def get_package_paths_from_toml(toml_dict: TomlDict) -> Optional[List[Path]]:
+    """Get the path of all packages specified according to the Poetry specification."""
+    package_entries = read_toml_variable(toml_dict, ['tool', 'poetry', 'packages'])
+
+    if package_entries is not None and isinstance(package_entries, list):
+        return [
+            p
+            for entry in package_entries
+            for p in Path('.').glob(get_packages_glob_pattern_from_package_entry(entry))
+        ]
+
+    package_name = read_package_name_from_poetry(toml_dict)
+
+    if package_name is None:
+        return None
+
+    return list(Path('.').glob(package_name))
+
+
 def get_project_modules_from_toml(toml_dict: TomlDict) -> List[str]:
     """Get the project name from a project file.
 
     The following files are checked in order:
         - pyproject.toml
     """
-    package_name = read_package_name_from_poetry(toml_dict)
+    package_name = get_package_paths_from_toml(toml_dict)
 
     if package_name is None:
         raise TomlValueMissingError('Failed to get package from config files.')
 
-    return [package_name]
+    return [str(p) for p in package_name]
 
 
 T = TypeVar('T')
@@ -129,15 +157,15 @@ def get_config_file() -> TomlDict:
     return toml.load(toml_file)
 
 
-def get_test_modules() -> List[str]:
+def get_test_modules(toml_dict: Optional[TomlDict] = None) -> List[str]:
     """Get the test modules from the vigent config file.
 
     If no modules are specified, the project modules are considered test modules.
     """
-    config_file = get_config_file()
+    toml_dict = get_config_file() if toml_dict is None else toml_dict
 
     test_modules_from_config = read_toml_variable(
-        config_file, ['tool', 'summon', 'plugins', 'python', 'test-modules']
+        toml_dict, ['tool', 'summon', 'plugins', 'python', 'test-modules']
     )
 
     if is_list_str(test_modules_from_config):
@@ -161,7 +189,8 @@ def args_or_all_modules(args: Optional[List[str]]) -> List[str]:
 
     toml_dict = get_config_file()
 
-    return [
+    return sorted({
         *get_project_modules_from_toml(toml_dict),
         *get_extra_modules_from_toml(toml_dict),
-    ]
+        *get_test_modules(toml_dict),
+    })
