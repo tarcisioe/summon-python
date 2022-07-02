@@ -2,7 +2,7 @@
 from typing import List, Optional
 
 import typer
-from summon.execute import execute, Result
+from summon.execute import Result, execute
 from summon.tasks import task_with_result, task_with_results
 
 from .project import args_or_all_modules, get_project_modules, get_test_modules
