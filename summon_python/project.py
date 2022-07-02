@@ -39,13 +39,16 @@ def is_list_str(obj: object) -> TypeGuard[List[str]]:
 
 
 def read_package_name_from_poetry(toml_dict: TomlDict) -> Optional[str]:
-    """Read the project name from Poetry, given the pyproject.toml convention."""
+    """Read the package name from Poetry, given the pyproject.toml convention."""
     package_name = read_toml_variable(toml_dict, ['tool', 'poetry', 'name'])
 
     if package_name is not None and not isinstance(package_name, str):
         raise TomlValueTypeError()
 
-    return package_name
+    if package_name is None:
+        return None
+
+    return package_name.replace('-', '_')
 
 
 class ProjectFileMissingError(SummonError):
@@ -189,8 +192,10 @@ def args_or_all_modules(args: Optional[List[str]]) -> List[str]:
 
     toml_dict = get_config_file()
 
-    return sorted({
-        *get_project_modules_from_toml(toml_dict),
-        *get_extra_modules_from_toml(toml_dict),
-        *get_test_modules(toml_dict),
-    })
+    return sorted(
+        {
+            *get_project_modules_from_toml(toml_dict),
+            *get_extra_modules_from_toml(toml_dict),
+            *get_test_modules(toml_dict),
+        }
+    )
