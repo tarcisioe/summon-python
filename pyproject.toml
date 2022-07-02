@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "summon_python"
-version = "0.2.0"
+version = "0.2.1"
 description = "A collection of Python project-related tasks for Summon."
 authors = ["Tarcísio Eduardo Moreira Crocomo <tarcisioe@pm.me>"]
 
