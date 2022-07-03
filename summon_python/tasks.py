@@ -67,14 +67,16 @@ def format(  # pylint: disable=redefined-builtin
     If files is omitted. everything is linted.
     """
 
-    check_flag = ['--check'] if check else []
+    check_flag = ['--check'] if check else ['-q']
 
     subject = args_or_all_modules(files)
 
     if not subject:
         return []
 
-    args = ['-q', *check_flag, *subject]
+    quiet_flag = ['-q'] if not check else []
+
+    args = [quiet_flag, *check_flag, *subject]
 
     return [
         execute(['black', *args], raise_error=False),
