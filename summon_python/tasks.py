@@ -74,7 +74,9 @@ def format(  # pylint: disable=redefined-builtin
     if not subject:
         return []
 
-    args = ['-q', *check_flag, *subject]
+    quiet_flag = ['-q'] if not check else []
+
+    args = [*quiet_flag, *check_flag, *subject]
 
     return [
         execute(['black', *args], raise_error=False),
