@@ -27,6 +27,10 @@ core = ["summon-tasks"]
 [tool.poetry.plugins.summon]
 summon_python = "summon_python.plugin"
 
+
+[tool.poetry.group.dev.dependencies]
+pytest-datadir = "^1.4.1"
+
 [tool.black]
 skip_string_normalization = true
 

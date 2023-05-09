@@ -85,15 +85,17 @@ def get_packages_glob_pattern_from_package_entry(toml_dict: TomlDict) -> str:
     return os.sep.join((toml_dict['from'], toml_dict['include']))
 
 
-def get_package_paths_from_toml(toml_dict: TomlDict) -> Optional[List[Path]]:
+def get_package_paths_from_toml(toml_dict: TomlDict, *, base_path: Optional[Path] = None) -> Optional[List[Path]]:
     """Get the path of all packages specified according to the Poetry specification."""
+    base_path = base_path if base_path is not None else Path.cwd()
+
     package_entries = read_toml_variable(toml_dict, ['tool', 'poetry', 'packages'])
 
     if package_entries is not None and isinstance(package_entries, list):
         return [
             p
             for entry in package_entries
-            for p in Path('.').glob(get_packages_glob_pattern_from_package_entry(entry))
+            for p in base_path.glob(get_packages_glob_pattern_from_package_entry(entry))
         ]
 
     package_name = read_package_name_from_poetry(toml_dict)
@@ -101,7 +103,7 @@ def get_package_paths_from_toml(toml_dict: TomlDict) -> Optional[List[Path]]:
     if package_name is None:
         return None
 
-    return list(Path('.').glob(package_name))
+    return [*base_path.glob(package_name), *base_path.glob(f"{package_name}.py")]
 
 
 def get_project_modules_from_toml(toml_dict: TomlDict) -> List[str]:
@@ -133,7 +135,7 @@ def first_not_none(candidates: Iterable[Optional[T]]) -> Optional[T]:
     return None
 
 
-def get_config_file() -> TomlDict:
+def get_config_file(*, base_path: Optional[Path] = None) -> TomlDict:
     """Find the config file and load it as a TomlDict.
 
     Files are searched for backwards from the current working directory.
@@ -144,8 +146,10 @@ def get_config_file() -> TomlDict:
         'pyproject.toml',
     )
 
+    base_path = base_path if base_path is not None else Path.cwd()
+
     config_file_candidates = (
-        reverse_directory_search(candidate, Path.cwd())
+        reverse_directory_search(candidate, base_path)
         for candidate in candidate_filenames
     )
 
