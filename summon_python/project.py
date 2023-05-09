@@ -101,7 +101,7 @@ def get_package_paths_from_toml(toml_dict: TomlDict) -> Optional[List[Path]]:
     if package_name is None:
         return None
 
-    return list(Path('.').glob(package_name))
+    return [*Path('.').glob(package_name), *Path('.').glob(f"{package_name}.py")]
 
 
 def get_project_modules_from_toml(toml_dict: TomlDict) -> List[str]:
