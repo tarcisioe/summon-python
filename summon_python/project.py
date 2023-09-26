@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, TypeVar, Union, cast
 
-import toml
+import tomli
 from summon.error import SummonError
 from summon.project import reverse_directory_search
 from typing_extensions import TypeGuard
@@ -24,11 +24,11 @@ def read_toml_variable(
 
     obj: Any = toml_dict
 
-    for p in path:
+    for item in path:
         if not isinstance(obj, dict):
             return None
 
-        obj = obj.get(p)
+        obj = obj.get(item)
 
     return cast(TomlObject, obj)
 
@@ -40,7 +40,7 @@ def is_list_str(obj: object) -> TypeGuard[List[str]]:
 
 def read_package_name_from_poetry(toml_dict: TomlDict) -> Optional[str]:
     """Read the package name from Poetry, given the pyproject.toml convention."""
-    package_name = read_toml_variable(toml_dict, ['tool', 'poetry', 'name'])
+    package_name = read_toml_variable(toml_dict, ["tool", "poetry", "name"])
 
     if package_name is not None and not isinstance(package_name, str):
         raise TomlValueTypeError()
@@ -48,7 +48,7 @@ def read_package_name_from_poetry(toml_dict: TomlDict) -> Optional[str]:
     if package_name is None:
         return None
 
-    return package_name.replace('-', '_')
+    return package_name.replace("-", "_")
 
 
 class ProjectFileMissingError(SummonError):
@@ -65,7 +65,7 @@ def get_extra_modules_from_toml(toml_dict: TomlDict) -> List[str]:
     Extras are modules that aren't part of the main project, such as helper scripts.
     """
     extras = read_toml_variable(
-        toml_dict, ['tool', 'summon', 'plugins', 'python', 'extra-modules']
+        toml_dict, ["tool", "summon", "plugins", "python", "extra-modules"]
     )
 
     if extras is None:
@@ -79,21 +79,21 @@ def get_extra_modules_from_toml(toml_dict: TomlDict) -> List[str]:
 
 def get_packages_glob_pattern_from_package_entry(toml_dict: TomlDict) -> str:
     """Get the glob pattern from a pyproject.toml Poetry entry in packages`."""
-    if 'from' not in toml_dict:
-        return toml_dict['include']
+    if "from" not in toml_dict:
+        return toml_dict["include"]
 
-    return os.sep.join((toml_dict['from'], toml_dict['include']))
+    return os.sep.join((toml_dict["from"], toml_dict["include"]))
 
 
 def get_package_paths_from_toml(toml_dict: TomlDict) -> Optional[List[Path]]:
     """Get the path of all packages specified according to the Poetry specification."""
-    package_entries = read_toml_variable(toml_dict, ['tool', 'poetry', 'packages'])
+    package_entries = read_toml_variable(toml_dict, ["tool", "poetry", "packages"])
 
     if package_entries is not None and isinstance(package_entries, list):
         return [
             p
             for entry in package_entries
-            for p in Path('.').glob(get_packages_glob_pattern_from_package_entry(entry))
+            for p in Path(".").glob(get_packages_glob_pattern_from_package_entry(entry))
         ]
 
     package_name = read_package_name_from_poetry(toml_dict)
@@ -101,7 +101,7 @@ def get_package_paths_from_toml(toml_dict: TomlDict) -> Optional[List[Path]]:
     if package_name is None:
         return None
 
-    return list(Path('.').glob(package_name))
+    return list(Path(".").glob(package_name))
 
 
 def get_project_modules_from_toml(toml_dict: TomlDict) -> List[str]:
@@ -113,12 +113,12 @@ def get_project_modules_from_toml(toml_dict: TomlDict) -> List[str]:
     package_name = get_package_paths_from_toml(toml_dict)
 
     if package_name is None:
-        raise TomlValueMissingError('Failed to get package from config files.')
+        raise TomlValueMissingError("Failed to get package from config files.")
 
     return [str(p) for p in package_name]
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def first_not_none(candidates: Iterable[Optional[T]]) -> Optional[T]:
@@ -140,8 +140,8 @@ def get_config_file() -> TomlDict:
     Candidates are described in `candidate_filenames`.
     """
     candidate_filenames = (
-        'summon.toml',
-        'pyproject.toml',
+        "summon.toml",
+        "pyproject.toml",
     )
 
     config_file_candidates = (
@@ -153,11 +153,12 @@ def get_config_file() -> TomlDict:
 
     if toml_file is None:
         raise ProjectFileMissingError(
-            'Could not find a config file. '
+            "Could not find a config file. "
             f'Candidates are: {", ".join(candidate_filenames)}.'
         )
 
-    return toml.load(toml_file)
+    with toml_file.open(encoding="utf8") as f:
+        return tomli.loads(f.read())
 
 
 def get_test_modules(toml_dict: Optional[TomlDict] = None) -> List[str]:
@@ -168,7 +169,7 @@ def get_test_modules(toml_dict: Optional[TomlDict] = None) -> List[str]:
     toml_dict = get_config_file() if toml_dict is None else toml_dict
 
     test_modules_from_config = read_toml_variable(
-        toml_dict, ['tool', 'summon', 'plugins', 'python', 'test-modules']
+        toml_dict, ["tool", "summon", "plugins", "python", "test-modules"]
     )
 
     if is_list_str(test_modules_from_config):

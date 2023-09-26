@@ -10,10 +10,10 @@ from .project import args_or_all_modules, get_project_modules, get_test_modules
 
 def test(
     coverage: bool = typer.Option(  # noqa: B008
-        default=False, help='Generate coverage information.'
+        default=False, help="Generate coverage information."
     ),
     html: bool = typer.Option(  # noqa: B008
-        default=False, help='Generate an html coverage report.'
+        default=False, help="Generate an html coverage report."
     ),
 ) -> List[Result]:
     """Run tests."""
@@ -22,7 +22,7 @@ def test(
     test_modules = get_test_modules()
 
     return [
-        execute(['pytest', *coverage_flag, *test_modules]),
+        execute(["pytest", *coverage_flag, *test_modules]),
         *([coverage_html()] if coverage and html else ()),
     ]
 
@@ -31,7 +31,7 @@ def lint(
     files: Optional[List[str]] = typer.Argument(default=None),  # noqa: B008
     *,
     full_report: bool = typer.Option(  # noqa: B008
-        default=False, help='Print detailed reports.'
+        default=False, help="Print detailed reports."
     ),
 ) -> List[Result]:
     """Run all linters.
@@ -44,13 +44,13 @@ def lint(
     if not subject:
         return []
 
-    pylint_report_flag = 'y' if full_report else 'n'
+    pylint_report_flag = "y" if full_report else "n"
 
     return [
-        execute(['mypy', *subject], raise_error=False),
-        execute(['flake8', *subject], raise_error=False),
+        execute(["mypy", *subject], raise_error=False),
+        execute(["flake8", *subject], raise_error=False),
         execute(
-            ['pylint', '-r', pylint_report_flag, *subject],
+            ["pylint", "-r", pylint_report_flag, *subject],
             raise_error=False,
         ),
     ]
@@ -59,7 +59,7 @@ def lint(
 def format(  # pylint: disable=redefined-builtin
     files: Optional[List[str]] = typer.Argument(default=None),  # noqa: B008
     check: bool = typer.Option(  # noqa: B008
-        default=False, help='Only checks instead of modifying.'
+        default=False, help="Only checks instead of modifying."
     ),
 ) -> List[Result]:
     """Run all formatters.
@@ -67,24 +67,24 @@ def format(  # pylint: disable=redefined-builtin
     If files is omitted. everything is linted.
     """
 
-    check_flag = ['--check'] if check else []
+    check_flag = ["--check"] if check else []
 
     subject = args_or_all_modules(files)
 
     if not subject:
         return []
 
-    args = ['-q', *check_flag, *subject]
+    args = ["-q", *check_flag, *subject]
 
     return [
-        execute(['black', *args], raise_error=False),
-        execute(['isort', *args], raise_error=False),
+        execute(["black", *args], raise_error=False),
+        execute(["isort", *args], raise_error=False),
     ]
 
 
 def coverage_html() -> Result:
     """Generate an html coverage report."""
-    return execute('coverage html', raise_error=False)
+    return execute("coverage html", raise_error=False)
 
 
 def static_checks() -> List[Result]:
